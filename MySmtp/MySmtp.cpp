@@ -1,3 +1,11 @@
+/**
+ * @file MySmpt.cpp
+ * @brief A Brief Smtp Client
+ * @author Du Zhongfan  (Student-ID:2020302041100)
+ * @date 2022/11/12     20:00
+ *
+ */
+
 #include"MySmtp.h"
 const char MySmtp::Base64EncodeMap[64]={'A','B','C','D','E','F','G','H','I','J','K','L',
                                      'M','N','O','P','Q','R','S','T','U','V','W','X',
@@ -6,6 +14,11 @@ const char MySmtp::Base64EncodeMap[64]={'A','B','C','D','E','F','G','H','I','J',
                                      'w','x','y','z','0','1','2','3','4','5','6','7',
                                      '8','9','+','/'};
 
+/**
+ * @brief 构造函数
+ * @param Account 账号
+ * @param PassWord 授权码(不是密码，需要去对应服务器申请smtp授权码)
+ */
 MySmtp::MySmtp(QString Account,QString PassWord)
 {
     this->Account = Account;
@@ -16,12 +29,20 @@ MySmtp::MySmtp(QString Account,QString PassWord)
     this->Client=CreateClientSocket();
 }
 
+
+/**
+ * @brief 析构函数 关闭socket
+ */
 MySmtp::~MySmtp()
 {
     CloseSocket(Client);
     CloseWSA();
 }
-//启动Winsock DLL
+
+
+/**
+ * @brief 初始化WSA
+ */
 void MySmtp::InitWSA() {
     WSADATA wsadata;
     if (WSAStartup(MAKEWORD(2, 2), &wsadata)) {
@@ -30,6 +51,11 @@ void MySmtp::InitWSA() {
     }
     return;
 }
+
+
+/**
+ * @brief base64编码
+ */
 QString MySmtp::Base64Encode(QString s){
     if(s==NULL){
         return NULL;
@@ -61,18 +87,11 @@ QString MySmtp::Base64Encode(QString s){
 
   return res;
 }
-//关闭Winsock DLL
-void MySmtp::CloseWSA() {
-    if (WSACleanup()) {
-        qDebug()<<"WSACleanup failed code:"<<WSAGetLastError();
-        return;
-    }
-    return;
-}
-/*
-  创建SOCKET
-  输出一个未连接服务器的socket
-*/
+
+
+/**
+ * @brief 创建客户端socket
+ */
 SOCKET MySmtp::CreateClientSocket() {
     SOCKET client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (client == INVALID_SOCKET) {
@@ -80,8 +99,13 @@ SOCKET MySmtp::CreateClientSocket() {
         return INVALID_SOCKET;
     } 
     return client;
-
 }
+
+
+/**
+ * @brief 通过账号获取对应服务器的域名
+ * @return example:smtp.qq.com
+ */
 QString MySmtp::GetDomineName() {
     QString temp = Account;
     QString EmailType;
@@ -94,7 +118,10 @@ QString MySmtp::GetDomineName() {
 
 }
 
-//与服务器建立TCP连接
+
+/**
+ * @brief 将创建的socket与对应服务器建立连接
+ */
 SOCKET MySmtp::ConnectToServer() {
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
@@ -116,7 +143,11 @@ SOCKET MySmtp::ConnectToServer() {
     return Client;
 
 }
-//接收服务器消息
+
+
+/**
+ * @brief 接受服务器响应
+ */
 QString MySmtp::ReceiveResponse(){
 
     char RecvBuf[BufferSize];
@@ -132,15 +163,12 @@ QString MySmtp::ReceiveResponse(){
     return str;
 
 }
-void MySmtp::SendMessage(QString message){
-    qDebug()<<"send:"<<message;
-    if(send(Client,message.toStdString().c_str(),message.size(),0)<0){
-        qDebug()<<"send failed code:"<<WSAGetLastError();
-        return;
-    }
-    return;
-}
 
+
+/**
+ * @brief 检查响应码是否正确
+ * @param NormalCode 正确的响应码
+ */
 bool MySmtp::CheckResponseCode(QString NormalCode){
     QString Response=ReceiveResponse();
     if(!DomineName.compare("smtp.whu.edu.cn")&&NormalCode==Ready){
@@ -160,6 +188,24 @@ bool MySmtp::CheckResponseCode(QString NormalCode){
     }
     return true;
 }
+
+
+/**
+ * @brief 客户端向服务器发送信息
+ */
+void MySmtp::SendMessage(QString message){
+    qDebug()<<"send:"<<message;
+    if(send(Client,message.toStdString().c_str(),message.size(),0)<0){
+        qDebug()<<"send failed code:"<<WSAGetLastError();
+        return;
+    }
+    return;
+}
+
+
+/**
+ * @brief 认证阶段，对账号和密码进行认证
+ */
 void MySmtp::Auth(){
     ConnectToServer();
     if(!CheckResponseCode(Ready)&&!ErrorNum){
@@ -183,6 +229,14 @@ void MySmtp::Auth(){
         ErrorNum=2;
     }
 }
+
+
+/**
+ * @brief 写邮件阶段
+ * @param TargetAccount 对方账号
+ * @param Subject 邮件主题
+ * @param Text 邮件内容
+ */
 void MySmtp::SendEmail(QString TargetAccount,QString Subject,QString Text){
     SendMessage("mail from: <"+Account+">"+"\r\n");
     if(!CheckResponseCode(OK)&&!ErrorResponseCode.compare(UserNotFound)){
@@ -209,7 +263,11 @@ void MySmtp::SendEmail(QString TargetAccount,QString Subject,QString Text){
         ErrorNum=3;
     }
 }
-//关闭socket
+
+
+/**
+ * @brief 关闭socket
+ */
 void MySmtp::CloseSocket(SOCKET s)
 {
     if (closesocket(s) == SOCKET_ERROR) {
@@ -219,4 +277,14 @@ void MySmtp::CloseSocket(SOCKET s)
     return;
 }
 
+/**
+ * @brief 关闭WSA
+ */
+void MySmtp::CloseWSA() {
+    if (WSACleanup()) {
+        qDebug()<<"WSACleanup failed code:"<<WSAGetLastError();
+        return;
+    }
+    return;
+}
 
