@@ -110,7 +110,7 @@ int main(int argc, char *argv[]){
     cout<<"(2) pop3 connection succeeed."<<endl;
 
     QString username = "stardream_x@126.com";
-    QString password = "VDEVVVHEOHOALASB";
+    QString password = "qwq";
     cout<<"username="<<username.toStdString()<<endl;
     cout<<"password="<<password.toStdString()<<endl;
 

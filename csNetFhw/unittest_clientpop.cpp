@@ -62,28 +62,28 @@ void search_dns_ipv4(QString server_name){
     QDnsLookup::disconnect(dns, nullptr, nullptr, nullptr);
 }
 
-QString get_dns_ipv4(QString server_name){
-    cout<<"server_Name="<<server_name.toStdString()<<endl;
-    QDnsLookup* dns = new QDnsLookup();
-    QElapsedTimer timer;
-    dns->setNameserver(QHostAddress(QString("202.103.0.68")));
-    dns->setType(QDnsLookup::A);
-    dns->setName(server_name);
-    cout<<dns->nameserver().toIPv4Address()<<endl;
-    cout<<"!"<<endl;
-    timer.start();
-    dns->lookup();
-    while(!dns->isFinished() && timer.elapsed()<10000);
-    if(!dns->isFinished()){
-        QList<QDnsHostAddressRecord> ql = dns->hostAddressRecords();
-        return QString(ql.first().value().toIPv4Address());
-        return "FAILED";
-    }
-    else{
-        QList<QDnsHostAddressRecord> ql = dns->hostAddressRecords();
-        return QString(ql.first().value().toIPv4Address());
-    }
-}
+//QString get_dns_ipv4(QString server_name){
+//    cout<<"server_Name="<<server_name.toStdString()<<endl;
+//    QDnsLookup* dns = new QDnsLookup();
+//    QElapsedTimer timer;
+//    dns->setNameserver(QHostAddress(QString("202.103.0.68")));
+//    dns->setType(QDnsLookup::A);
+//    dns->setName(server_name);
+//    cout<<dns->nameserver().toIPv4Address()<<endl;
+//    cout<<"!"<<endl;
+//    timer.start();
+//    dns->lookup();
+//    while(!dns->isFinished() && timer.elapsed()<10000);
+//    if(!dns->isFinished()){
+//        QList<QDnsHostAddressRecord> ql = dns->hostAddressRecords();
+//        return QString(ql.first().value().toIPv4Address());
+//        return "FAILED";
+//    }
+//    else{
+//        QList<QDnsHostAddressRecord> ql = dns->hostAddressRecords();
+//        return QString(ql.first().value().toIPv4Address());
+//    }
+//}
 
 int main(int argc, char *argv[]){
     QCoreApplication my_process(argc, argv);

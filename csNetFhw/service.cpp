@@ -6,5 +6,5 @@ Service::Service()
 }
 
 Service::~Service(){
-    delete(this->user);
+    free(this->user);
 }
