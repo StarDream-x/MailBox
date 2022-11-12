@@ -44,6 +44,11 @@ void ClientPop::receive_response(ServerResponse & response){
     char buffer[MAX_BUFFER_SIZE];
     this->socket->socket_read_ready();
     this->socket->read_line(buffer, MAX_BUFFER_SIZE);
+//    printf("BUFFER_BEGIN:\n");
+//    int l=strlen(buffer);
+//    printf("length=%d\n",l);
+//    for(int i=0;i<l;++i) printf("%c",buffer[i]);
+//    printf("\nBUFFER_END\n");
     if(buffer[0] == '+'){
         response.status = 1;
         response.status_message = QString(buffer).remove(0, 4);
@@ -62,6 +67,8 @@ void ClientPop::get_data(ServerResponse &response){
     while(1){
         memset(buffer, 0, sizeof(buffer));
         size = this->socket->read_line(buffer, MAX_BUFFER_SIZE);
+        int l=strlen(buffer);
+        printf("l=%d\n",l);
         if(size<3 || (buffer[0]=='.'&&size==3)){
             break;
         }

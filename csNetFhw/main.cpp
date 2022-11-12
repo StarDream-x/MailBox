@@ -1,3 +1,8 @@
+/**
+ * @brief APP Entry
+ *
+ */
+
 #include "mainwindow.h"
 
 #include <QApplication>
