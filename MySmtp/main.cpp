@@ -10,8 +10,7 @@ int main(int argc, char *argv[])
     MySmtp smtp("2020302041100@whu.edu.cn","RdicW24DeFYnscpV");
     smtp.Auth();
     smtp.SendEmail("729159553@qq.com","test","test\r\naaaa");
+    qDebug()<<smtp.ErrorNum;
 
-
-//    smtp.SendMessage("")
     return a.exec();
 }

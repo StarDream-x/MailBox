@@ -11,6 +11,7 @@ MySmtp::MySmtp(QString Account,QString PassWord)
     this->Account = Account;
     this->PassWord=PassWord;
     this->Port=25;
+    this->ErrorNum=0;
     InitWSA();
     this->Client=CreateClientSocket();
 }
@@ -102,6 +103,7 @@ SOCKET MySmtp::ConnectToServer() {
     struct hostent* host = gethostbyname(temp.toStdString().c_str());
     if (!host) {
         qDebug()<<"Get IP address error!";
+        ErrorNum=1;
         return false;
     }
     const char* ip = inet_ntoa(*(struct in_addr*)host->h_addr_list[0]);
@@ -139,7 +141,7 @@ void MySmtp::SendMessage(QString message){
     return;
 }
 
-void MySmtp::CheckResponseCode(QString NormalCode){
+bool MySmtp::CheckResponseCode(QString NormalCode){
     QString Response=ReceiveResponse();
     if(!DomineName.compare("smtp.whu.edu.cn")&&NormalCode==Ready){
         char RecvBuf[BufferSize];
@@ -152,38 +154,60 @@ void MySmtp::CheckResponseCode(QString NormalCode){
     QString ResponseCode;
     ResponseCode=Response.left(3);
     if(ResponseCode.compare(NormalCode)){
+        ErrorResponseCode=ResponseCode;
         qDebug()<<"Error code:"<<ResponseCode;
-        return;
+        return false;
     }
+    return true;
 }
 void MySmtp::Auth(){
     ConnectToServer();
-    CheckResponseCode(Ready);
+    if(!CheckResponseCode(Ready)&&!ErrorNum){
+        ErrorNum=3;
+    }
     SendMessage("EHLO "+DomineName+"\r\n");
-    CheckResponseCode(OK);
-//    smtp.SendMessage(client,"STARTTLS\r\n");
-//    smtp.CheckResponseCode(client,Ready);
+    if(!CheckResponseCode(OK)&&!ErrorNum){
+        ErrorNum=3;
+    }
+
     SendMessage("AUTH LOGIN\r\n");
-    CheckResponseCode(WaitForInput);
+    if(!CheckResponseCode(WaitForInput)&&!ErrorNum){
+        ErrorNum=3;
+    }
     SendMessage(Base64Encode(Account)+"\r\n");
-    CheckResponseCode(WaitForInput);
+    if(!CheckResponseCode(WaitForInput)&&!ErrorNum){
+        ErrorNum=3;
+    }
     SendMessage(Base64Encode(PassWord)+"\r\n");
-    CheckResponseCode(AuthSuccessfully);
+    if(!CheckResponseCode(AuthSuccessfully)&&!ErrorNum&&!ErrorResponseCode.compare(AuthFailed)){
+        ErrorNum=2;
+    }
 }
 void MySmtp::SendEmail(QString TargetAccount,QString Subject,QString Text){
     SendMessage("mail from: <"+Account+">"+"\r\n");
-    CheckResponseCode(OK);
+    if(!CheckResponseCode(OK)&&!ErrorResponseCode.compare(UserNotFound)){
+        ErrorNum=1;
+    }
     SendMessage("rcpt to: <"+TargetAccount+">"+"\r\n");
-    CheckResponseCode(OK);
+    if(!CheckResponseCode(OK)&&!ErrorResponseCode.compare(UserNotFound)){
+        ErrorNum=1;
+    }
     SendMessage("DATA\r\n");
-    CheckResponseCode(StartToSend);
+
+    if(!CheckResponseCode(StartToSend)&&!ErrorNum){
+        ErrorNum=3;
+    }
     SendMessage("From: "+Account+"\r\n");
     SendMessage("To: "+TargetAccount+"\r\n");
     SendMessage("Subject: "+Subject+"\r\n");
     SendMessage("\r\n"+Text+"\r\n.\r\n");
-    CheckResponseCode(OK);
+    if(!CheckResponseCode(OK)&&!ErrorNum){
+        ErrorNum=3;
+    }
     SendMessage("QUIT\r\n");
-    CheckResponseCode(Bye);
+    if(!CheckResponseCode(Bye)&&!ErrorNum){
+        ErrorNum=3;
+    }
 }
 //关闭socket
 void MySmtp::CloseSocket(SOCKET s)

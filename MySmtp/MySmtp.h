@@ -5,11 +5,13 @@
 #include <QString>
 #include <QDebug>
 //#define PORT 25
-#define BufferSize 1024
+#define BufferSize 65535
 #define Ready "220"
 #define OK "250"
 #define WaitForInput "334"
 #define AuthSuccessfully "235"
+#define AuthFailed "535"
+#define UserNotFound "550"
 #define StartToSend "354"
 #define Bye "221"
 class MySmtp
@@ -24,12 +26,14 @@ public:
     QString GetDomineName();
     QString ReceiveResponse();
     void SendMessage(QString message);
-    void CheckResponseCode(QString NormalCode);
+    bool CheckResponseCode(QString NormalCode);
     void CloseSocket(SOCKET s);
     QString DomineName;
     QString Base64Encode(QString s);
     void Auth();
     void SendEmail(QString TargetAccount,QString Subject,QString Text);
+    int ErrorNum;
+    QString ErrorResponseCode;
 private:
     static const char Base64EncodeMap[64];
     int Port;
@@ -37,6 +41,7 @@ private:
     QString Account;
     QString PassWord;
     SOCKET Client;
+
 };
 
 
