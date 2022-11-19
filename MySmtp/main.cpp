@@ -7,10 +7,16 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
-    MySmtp smtp("a@whu.edu.cn","password");
-    smtp.Auth();
-    smtp.SendEmail("729159553@qq.com","test","test"); //对方账号，主题，内容
-    qDebug()<<smtp.ErrorNum;
-
-    return a.exec();
+    /**
+     * @example
+ *     MySmtp smtp("sss@126.com","password");
+       smtp.Auth();
+       smtp.AttachmentArray[0]="D:\\dzf.rar";
+       smtp.AttachmentArray[1]="D:\\dzf.xlsx";
+       smtp.AttachmentArray[2]="D:\\dzf.xls";//
+       smtp.SendEmail("sss@163.com","test","test");
+       qDebug()<<smtp.ErrorNum;
+     */
+      return a.exec();
 }
+

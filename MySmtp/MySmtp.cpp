@@ -1,9 +1,8 @@
 /**
  * @file MySmpt.cpp
- * @brief A Brief Smtp Client
+ * @brief A Brief Smtp Client(support mime)
  * @author Du Zhongfan  (Student-ID:2020302041100)
  * @date 2022/11/12     20:00
- *
  */
 
 #include"MySmtp.h"
@@ -13,6 +12,27 @@ const char MySmtp::Base64EncodeMap[64]={'A','B','C','D','E','F','G','H','I','J',
                                      'k','l','m','n','o','p','q','r','s','t','u','v',
                                      'w','x','y','z','0','1','2','3','4','5','6','7',
                                      '8','9','+','/'};
+
+const QMap<QString,QString> MySmtp:: SuffixToType={{"docx","application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+                                                   {"doc","application/msword"},
+                                                   {"xlsx","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+                                                   {"xls","application/vnd.ms-excel"},
+                                                   {"ppt","application/vnd.ms-excel"},
+                                                   {"pptx","application/vnd.openxmlformats-officedocument.presentationml.presentation"},
+                                                   {"txt","application/octet-stream"},
+                                                   {"pdf","application/pdf"},
+                                                   {"jpg","image/jpeg"},
+                                                   {"jpeg","image/jpeg"},
+                                                   {"png","image/png"},
+                                                   {"gif","image/gif"},
+                                                   {"mp3","audio/mpeg"},
+                                                   {"mpg","video/mpeg"},
+                                                   {"mp4","video/mp4"},
+                                                   {"tar","application/x-tar"},
+                                                   {"zip","application/zip"},
+                                                   {"rar","application/rar"}};
+
+
 
 /**
  * @brief 构造函数
@@ -27,6 +47,9 @@ MySmtp::MySmtp(QString Account,QString PassWord)
     this->ErrorNum=0;
     InitWSA();
     this->Client=CreateClientSocket();
+    for(int i=0;i<MaxNumOfAttachment;++i){
+        AttachmentArray[i]="";
+    }
 }
 
 
@@ -80,6 +103,42 @@ QString MySmtp::Base64Encode(QString s){
             res.append(Base64EncodeMap[(s[i].toLatin1()>>2)&0x3c]);
             res.append(Base64EncodeMap[((s[i].toLatin1()<<4)&0x30)|((s[i+1].toLatin1()>>4)&0x0f)]);
             res.append(Base64EncodeMap[(s[i+1].toLatin1()<<2)&0x3c]);
+            res.append("=");
+        }
+    }
+
+
+  return res;
+}
+
+
+/**
+ * @brief 当输入为QByteArray时base64编码的重载
+ */
+QString MySmtp::Base64Encode(QByteArray s){
+    if(!s.size()){
+        return NULL;
+    }
+    UINT32 len=s.size();
+    UINT32 i;
+    QString res="";
+    for(i=0;i+3<=len;i+=3){
+        res.append(Base64EncodeMap[(s[i]>>2)&0x3f]);
+        res.append(Base64EncodeMap[((s[i]<<4)&0x30)|((s[i+1]>>4)&0x0f)]);
+        res.append(Base64EncodeMap[((s[i+1]<<2)&0x3c)|((s[i+2]>>6)&0x03)]);
+        res.append(Base64EncodeMap[s[i+2]&0x3f]);
+    }
+    if(i<len){
+        if(len-i==1){
+            res.append(Base64EncodeMap[(s[i]>>2)&0x3f]);
+            res.append(Base64EncodeMap[(s[i]<<4)&0x30]);
+            res.append('=');
+            res.append("=");
+        }
+        else{
+            res.append(Base64EncodeMap[(s[i]>>2)&0x3c]);
+            res.append(Base64EncodeMap[((s[i]<<4)&0x30)|((s[i+1]>>4)&0x0f)]);
+            res.append(Base64EncodeMap[(s[i+1]<<2)&0x3c]);
             res.append("=");
         }
     }
@@ -195,10 +254,10 @@ bool MySmtp::CheckResponseCode(QString NormalCode){
  */
 void MySmtp::SendMessage(QString message){
     qDebug()<<"send:"<<message;
-    if(send(Client,message.toStdString().c_str(),message.size(),0)<0){
-        qDebug()<<"send failed code:"<<WSAGetLastError();
-        return;
-    }
+    if(send(Client,message.toLocal8Bit().constData(),message.toLocal8Bit().size(),0)<0){
+            qDebug()<<"send failed code:"<<WSAGetLastError();
+            return;
+        }
     return;
 }
 
@@ -208,6 +267,7 @@ void MySmtp::SendMessage(QString message){
  */
 void MySmtp::Auth(){
     ConnectToServer();
+
     if(!CheckResponseCode(Ready)&&!ErrorNum){
         ErrorNum=3;
     }
@@ -253,8 +313,18 @@ void MySmtp::SendEmail(QString TargetAccount,QString Subject,QString Text){
     }
     SendMessage("From: "+Account+"\r\n");
     SendMessage("To: "+TargetAccount+"\r\n");
-    SendMessage("Subject: "+Subject+"\r\n");
-    SendMessage("\r\n"+Text+"\r\n.\r\n");
+    SendMessage("Subject: "+Subject+ "\r\n");
+    SendMessage("MIME-Version: 1.0\r\n");
+    SendMessage("Content-Type: multipart/mixed;boundary=dzfdzfdzf\r\n");
+
+    SendMessage("\r\n--dzfdzfdzf\r\n");
+    SendMessage("Content-Type: text/plain;charset=GB18030\r\n");
+    SendMessage("Content-Transfer-Encoding: 8bit\r\n");
+
+    SendMessage("\r\n"+Text+"\r\n");
+    AddAttachment();
+    SendMessage("\r\n--dzfdzfdzf--\r\n");
+    SendMessage(".\r\n");
     if(!CheckResponseCode(OK)&&!ErrorNum){
         ErrorNum=3;
     }
@@ -262,6 +332,48 @@ void MySmtp::SendEmail(QString TargetAccount,QString Subject,QString Text){
     if(!CheckResponseCode(Bye)&&!ErrorNum){
         ErrorNum=3;
     }
+}
+
+
+/**
+ * @brief 添加附件
+ */
+void MySmtp::AddAttachment(){
+    for(int i=0;i<MaxNumOfAttachment;++i){
+        QString Attachment=AttachmentArray[i];
+        if(!Attachment.size()){
+            break;
+        }
+
+        SendMessage("\r\n--dzfdzfdzf\r\n");
+        QFile TargetFile(Attachment);
+        if (!TargetFile.exists()) {
+            qDebug() << "File not exist";
+            ErrorNum=4;
+            return;
+        }
+        if (!TargetFile.open(QIODevice::ReadOnly)) {
+            qDebug() << "Couldn't open the file";
+            ErrorNum=5;
+            return;
+        }
+        QByteArray FileBytes = TargetFile.readAll();
+        TargetFile.close();
+        QFileInfo TargetFileInfo(Attachment);
+        QString suffix=TargetFileInfo.suffix();
+        QString type="";
+        if(SuffixToType.contains(suffix)){
+            type=SuffixToType[suffix];
+        }
+        else{
+            type="application/octet-stream";
+        }
+        SendMessage("Content-Type: "+type+"\r\n");
+        SendMessage("Content-Disposition: attachment; filename="+TargetFileInfo.fileName()+"\r\n");
+        SendMessage("Content-Transfer-Encoding: base64\r\n");
+        SendMessage("\r\n"+Base64Encode(FileBytes)+"\r\n");
+    }
+
 }
 
 
@@ -276,6 +388,7 @@ void MySmtp::CloseSocket(SOCKET s)
     }
     return;
 }
+
 
 /**
  * @brief 关闭WSA
