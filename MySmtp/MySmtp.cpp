@@ -80,7 +80,7 @@ void MySmtp::InitWSA() {
  * @brief base64编码
  */
 QString MySmtp::Base64Encode(QString s){
-    if(s==NULL){
+    if(s==""){
         return NULL;
     }
     UINT32 len=s.size();
