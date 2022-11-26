@@ -62,28 +62,28 @@ void search_dns_ipv4(QString server_name){
     QDnsLookup::disconnect(dns, nullptr, nullptr, nullptr);
 }
 
-QString get_dns_ipv4(QString server_name){
-    cout<<"server_Name="<<server_name.toStdString()<<endl;
-    QDnsLookup* dns = new QDnsLookup();
-    QElapsedTimer timer;
-    dns->setNameserver(QHostAddress(QString("202.103.0.68")));
-    dns->setType(QDnsLookup::A);
-    dns->setName(server_name);
-    cout<<dns->nameserver().toIPv4Address()<<endl;
-    cout<<"!"<<endl;
-    timer.start();
-    dns->lookup();
-    while(!dns->isFinished() && timer.elapsed()<10000);
-    if(!dns->isFinished()){
-        QList<QDnsHostAddressRecord> ql = dns->hostAddressRecords();
-        return QString(ql.first().value().toIPv4Address());
-        return "FAILED";
-    }
-    else{
-        QList<QDnsHostAddressRecord> ql = dns->hostAddressRecords();
-        return QString(ql.first().value().toIPv4Address());
-    }
-}
+//QString get_dns_ipv4(QString server_name){
+//    cout<<"server_Name="<<server_name.toStdString()<<endl;
+//    QDnsLookup* dns = new QDnsLookup();
+//    QElapsedTimer timer;
+//    dns->setNameserver(QHostAddress(QString("202.103.0.68")));
+//    dns->setType(QDnsLookup::A);
+//    dns->setName(server_name);
+//    cout<<dns->nameserver().toIPv4Address()<<endl;
+//    cout<<"!"<<endl;
+//    timer.start();
+//    dns->lookup();
+//    while(!dns->isFinished() && timer.elapsed()<10000);
+//    if(!dns->isFinished()){
+//        QList<QDnsHostAddressRecord> ql = dns->hostAddressRecords();
+//        return QString(ql.first().value().toIPv4Address());
+//        return "FAILED";
+//    }
+//    else{
+//        QList<QDnsHostAddressRecord> ql = dns->hostAddressRecords();
+//        return QString(ql.first().value().toIPv4Address());
+//    }
+//}
 
 int main(int argc, char *argv[]){
     QCoreApplication my_process(argc, argv);
@@ -94,7 +94,14 @@ int main(int argc, char *argv[]){
 //    server_ip = get_dns_ipv4("www.baidu.com");
 //    cout<<"ip_address="<<server_ip.toStdString()<<endl;
 
-    QString server_ip="14.18.175.202";
+    //qq mail
+//    QString server_ip="14.18.175.202";
+
+    //whu mail
+//    QString server_ip="202.114.64.84";
+
+    //126 mail
+    QString server_ip="123.126.96.209";
 
     ClientSocket sock(server_ip, DEFAULT_PORT);
     cout<<"(1) socket connection successed."<<endl;
@@ -102,7 +109,7 @@ int main(int argc, char *argv[]){
     ClientPop pop(server_ip, DEFAULT_PORT);
     cout<<"(2) pop3 connection succeeed."<<endl;
 
-    QString username = "110@qq.com";
+    QString username = "stardream_x@126.com";
     QString password = "qwq";
     cout<<"username="<<username.toStdString()<<endl;
     cout<<"password="<<password.toStdString()<<endl;

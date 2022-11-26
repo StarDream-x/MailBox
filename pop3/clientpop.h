@@ -32,6 +32,7 @@ public:
         cout<<"status="<<status<<endl;
         cout<<"status_message="<<status_message.toStdString()<<endl;
         int size = data.size();
+        printf("size=%d\n",size);
         for(int i=0;i<size;++i){
             cout<<data[i].toStdString()<<endl;
         }

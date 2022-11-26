@@ -1,3 +1,8 @@
+/**
+ * @brief Default MainWindow
+ *
+ */
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 

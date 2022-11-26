@@ -71,6 +71,7 @@ ssize_t ClientSocket::read(char* buffer, size_t size){
 
 ssize_t ClientSocket::read_line(char* buffer, size_t size){
     bool op = session->canReadLine();
+    printf("op=%d\n",op);
     if(!op){
         /*
         (TODO): I found that sometimes the content returned by qq mailbox does not
@@ -88,6 +89,7 @@ ssize_t ClientSocket::read_line(char* buffer, size_t size){
 ssize_t ClientSocket::read_all(char* buffer){
     QByteArray buf = session->readAll();
     int buf_size = buf.size();
+    printf("buf_size=%d\n",buf_size);
     memcpy(buffer, buf, buf_size);
     return buf_size;
 }
