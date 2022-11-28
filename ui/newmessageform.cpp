@@ -40,10 +40,20 @@ void NewMessageForm::send_button_clicked() {
         QMessageBox::critical(nullptr, "Error", "Please login");
         return;
     }
+
     auto receiver = ui->receiver_text->text();
     auto subject = ui->subject_text->text();
     auto body = ui->body_text->toPlainText();
+
+    auto attachment_array = smtp_client->AttachmentArray;
+    for (int i = 0; i < ui->attachment_list->count(); ++i) {
+        attachment_array[i] = ui->attachment_list->item(i)->text();
+    }
+    for (int i = ui->attachment_list->count(); i < MaxNumOfAttachment; ++i) {
+        attachment_array[i] = QString();
+    }
     smtp_client->SendEmail(receiver, subject, body);
+
     if (smtp_client->ErrorNum == 0) {
         QMessageBox::information(this, "Success", "Email was sent");
         close();
