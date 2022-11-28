@@ -57,12 +57,8 @@ void MainForm::refresh_message_list() {
         if (!response.status) {
             throw Error("Failure", response.status_message);
         }
-        auto list_model = dynamic_cast<QStandardItemModel*>(ui->message_list->model());
-        list_model->removeRows(0, list_model->rowCount());
-        for (auto& row : response.data) {
-            auto item = new QStandardItem(row);
-            list_model->appendRow(item);
-        }
+        ui->message_list->clear();
+        ui->message_list->addItems(response.data);
     } catch (Error& error) {
         QMessageBox::critical(this, "Error", error.to_string());
     }
@@ -95,6 +91,7 @@ void MainForm::login_button_clicked() {
     auto smtp_host = smtp_client->GetDomineName();
     ui->smtp_host_text->setText(smtp_host);
     set_control_state(true);
+    refresh_message_list();
 }
 
 void MainForm::logout_button_clicked() {
