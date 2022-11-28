@@ -25,6 +25,8 @@
 #define StartToSend "354"
 #define Bye "221"
 
+#include "error.h"
+
 
 /**
  * @brief The MySmtp class

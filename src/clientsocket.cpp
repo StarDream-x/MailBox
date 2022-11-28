@@ -64,12 +64,12 @@ void ClientSocket::socket_read_ready(){
     }
 }
 
-ssize_t ClientSocket::read(char* buffer, size_t size){
-    ssize_t state = session->read(buffer, size);
+qint64 ClientSocket::read(char* buffer, size_t size){
+    qint64 state = session->read(buffer, size);
     return state;
 }
 
-ssize_t ClientSocket::read_line(char* buffer, size_t size){
+qint64 ClientSocket::read_line(char* buffer, size_t size){
     bool op = session->canReadLine();
     printf("op=%d\n",op);
     if(!op){
@@ -82,19 +82,18 @@ ssize_t ClientSocket::read_line(char* buffer, size_t size){
         return read_all(buffer);
         // throw Error("Recieving error", "Incomplete line occurred.");
     }
-    ssize_t state = session->readLine(buffer, size);
+    qint64 state = session->readLine(buffer, size);
     return state;
 }
 
-ssize_t ClientSocket::read_all(char* buffer){
+qint64 ClientSocket::read_all(char* buffer){
     QByteArray buf = session->readAll();
-    int buf_size = buf.size();
-    printf("buf_size=%d\n",buf_size);
+    qint64 buf_size = buf.size();
     memcpy(buffer, buf, buf_size);
     return buf_size;
 }
 
-ssize_t ClientSocket::write(char* const & content, size_t size){
-    int state = session->write(content, size);
+qint64 ClientSocket::write(char* const & content, size_t size){
+    qint64 state = session->write(content, size);
     return state;
 }

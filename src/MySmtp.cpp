@@ -69,8 +69,7 @@ MySmtp::~MySmtp()
 void MySmtp::InitWSA() {
     WSADATA wsadata;
     if (WSAStartup(MAKEWORD(2, 2), &wsadata)) {
-        qDebug()<<"WSAStartup failed code:"<< WSAGetLastError();
-        return;
+        throw Error("WSAStartup failed", "");
     }
     return;
 }

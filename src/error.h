@@ -22,10 +22,8 @@ public:
         reason = error_reason;
     }
     ~Error() throw() {}
-    const char* what() const throw(){
-        QString message;
-        message = "Exception: " + problem + ": " + reason;
-        return message.toLatin1().data();
+    QString to_string() {
+        return "Exception: " + problem + ": " + reason;
     }
 };
 

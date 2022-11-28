@@ -61,14 +61,14 @@ void ClientPop::receive_response(ServerResponse & response){
 
 void ClientPop::get_data(ServerResponse &response){
     char buffer[MAX_BUFFER_SIZE];
-    ssize_t size;
+    qint64 size;
     QString message_line;
     response.data.clear();
     while(1){
         memset(buffer, 0, sizeof(buffer));
         size = this->socket->read_line(buffer, MAX_BUFFER_SIZE);
-        int l=strlen(buffer);
-        printf("l=%d\n",l);
+        size_t l = strlen(buffer);
+        printf("l=%llu\n",l);
         if(size<3 || (buffer[0]=='.'&&size==3)){
             break;
         }
