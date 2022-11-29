@@ -37,7 +37,7 @@ NewMessageForm::~NewMessageForm() {
 
 void NewMessageForm::send_button_clicked() {
     if (smtp_client == nullptr) {
-        QMessageBox::critical(nullptr, "Error", "Please login");
+        QMessageBox::critical(this, "Error", "Please login");
         return;
     }
 
