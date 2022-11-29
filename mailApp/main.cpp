@@ -10,9 +10,7 @@
 
 int main(int argc, char *argv[])
 {
-//    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Ceil);
-//    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Floor);
     QApplication a(argc, argv);
     Index *w = new Index;
     w->show();

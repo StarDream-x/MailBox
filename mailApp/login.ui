@@ -37,7 +37,7 @@
      <rect>
       <x>73</x>
       <y>15</y>
-      <width>101</width>
+      <width>131</width>
       <height>41</height>
      </rect>
     </property>
@@ -186,7 +186,7 @@ background-color: rgba(12, 57, 134, 200);
 color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
-     <string>EXIST</string>
+     <string>EXIT</string>
     </property>
    </widget>
   </widget>

@@ -118,7 +118,7 @@ QByteArray QxtPop3AuthReplyImpl::dialog(QByteArray received)
         {
             // authenticated
             m_reply->status = QxtPop3Reply::Completed;
-            m_reply->finish(QxtPop3Reply::OK);
+            m_reply->finish(QxtPop3Reply::Ok);
             pop->authenticated();
         }
         break;
@@ -157,7 +157,7 @@ QByteArray QxtPop3QuitReplyImpl::dialog(QByteArray received)
         break;
     case QuitSent:
         m_reply->status = QxtPop3Reply::Completed;
-        m_reply->finish(QxtPop3Reply::OK);
+        m_reply->finish(QxtPop3Reply::Ok);
         break;
     default:
         break;
@@ -203,7 +203,7 @@ QByteArray QxtPop3StatReplyImpl::dialog(QByteArray received)
             QString ok;
             input >> ok >> m_count >> m_size;
             m_reply->status = QxtPop3Reply::Completed;
-            m_reply->finish(QxtPop3Reply::OK);
+            m_reply->finish(QxtPop3Reply::Ok);
         } else {
             m_reply->status = QxtPop3Reply::Error;
             m_reply->errString = QString::fromLatin1(received);
@@ -265,7 +265,7 @@ QByteArray QxtPop3ListReplyImpl::dialog(QByteArray received)
             if (words[0] == QLatin1String("."))
             {
                 m_reply->status = QxtPop3Reply::Completed;
-                m_reply->finish(QxtPop3Reply::OK);
+                m_reply->finish(QxtPop3Reply::Ok);
             }
             else
             {
@@ -350,7 +350,7 @@ QByteArray QxtPop3RetrReplyImpl::dialog(QByteArray received)
                     // Termination line. The whole message is received by now.
                     m_msg = new QxtMailMessage(m_message);
                     m_reply->status = QxtPop3Reply::Completed;
-                    m_reply->finish(QxtPop3Reply::OK);
+                    m_reply->finish(QxtPop3Reply::Ok);
                 }
                 else // remove first dot
                 {
@@ -402,7 +402,7 @@ QByteArray QxtPop3ResetReplyImpl::dialog(QByteArray received)
         if (isAnswerOK(received))
         {
             m_reply->status = QxtPop3Reply::Completed;
-            m_reply->finish(QxtPop3Reply::OK);
+            m_reply->finish(QxtPop3Reply::Ok);
         } else {
             m_reply->status = QxtPop3Reply::Error;
             m_reply->errString = QString::fromLatin1(received);
@@ -452,7 +452,7 @@ QByteArray QxtPop3DeleReplyImpl::dialog(QByteArray received)
         if (isAnswerOK(received))
         {
             m_reply->status = QxtPop3Reply::Completed;
-            m_reply->finish(QxtPop3Reply::OK);
+            m_reply->finish(QxtPop3Reply::Ok);
         } else {
             m_reply->status = QxtPop3Reply::Error;
             m_reply->errString = QString::fromLatin1(received);

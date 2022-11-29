@@ -2,12 +2,14 @@
 * @projectName UIDesign
 * @brief Introduction
 * @author WangXinzhe (Student-ID:2020302142180)
+* @author Wang Haonan (Student-ID:2020302191718)
 * @date 2022-11-29
 */
 #include "login.h"
 #include "qhome.h"
 #include<QStyleOption>
 #include<QPainter>
+#include <QMessageBox>
 
 Index::Index(QWidget *parent)
     : QWidget(parent)
@@ -44,7 +46,7 @@ void Index::loginHandler(){
 }
 
 void Index::connectFail(){
-
+    QMessageBox::critical(this, "Error", "Login failed");
 }
 
 void Index::connectSuccess(){

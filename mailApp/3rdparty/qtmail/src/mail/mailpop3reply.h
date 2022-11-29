@@ -55,7 +55,7 @@ public:
     };
 
     enum ReturnCode {
-        OK,
+        Ok,
         Timeout,
         Failed,
         Aborted
